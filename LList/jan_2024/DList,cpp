@@ -1,0 +1,315 @@
+#include "DList.h"
+
+
+
+DList::DList()
+{
+	head = NULL;
+	maxCnt = 0;
+	brel = 0;
+}
+
+DList::DList(int max)
+{
+	head = NULL;
+	maxCnt = max;
+	brel = 0;
+}
+
+
+DList::~DList()
+{
+	while (!isEmpty())
+	{
+		int tmp = deleteFromHead();
+	}
+}
+
+DListNode* DList::findNodePtr(int el)
+{
+	if (isEmpty())
+		throw new exception("List is empty");
+	DListNode *ret = head;
+	while (ret != NULL && ret->info != el)
+	{
+		ret = ret->next;
+	}
+	return ret;
+}
+
+int DList::getHeadEl()
+{
+	if (isEmpty())
+		throw new exception("List is empty");
+	return head->info;
+}
+
+int DList::getNextEl(int el)
+{
+	if (isEmpty())
+		throw new exception("List is empty");
+	DListNode* tmp = findNodePtr(el);
+	if (tmp == NULL)
+		throw new exception("Node doesn't exist");
+	if (tmp->next == NULL)
+		throw new exception("Element doesn't have next node");
+	return tmp->next->info;
+}
+
+int DList::getPreviousEl(int el)
+{
+	if (isEmpty())
+		throw new exception("List is empty");
+	DListNode* tmp = findNodePtr(el);
+	if (tmp == NULL)
+		throw new exception("Node doesn't exist");
+	if (tmp->prev == NULL)
+		throw new exception("Element doesn't have previous node");
+	return tmp->prev->info;
+}
+
+bool DList::isInList(int el)
+{
+	if (isEmpty())
+		return false;
+	DListNode* tmp = findNodePtr(el);
+	if (tmp == NULL)
+		return false;
+	else
+		return true;
+}
+
+void DList::deleteEl(int el)
+{
+	if (!isEmpty())
+		if (head->isEqual(el))
+		{
+			DListNode *tmp = head;
+			head = head->next;
+			head->prev = NULL;
+			delete tmp;
+		}
+		else
+		{
+			DListNode *tmp;
+			for (tmp = head->next; tmp != NULL && !(tmp->isEqual(el)); tmp = tmp->next);
+			if (tmp != NULL)
+			{
+				tmp->prev->next = tmp->next;
+				tmp->next->prev = tmp->prev;
+				delete tmp;
+			}
+		}
+}
+
+void DList::addToHead(int el)
+{
+	if(isFull())
+	{
+		DListNode* tmp = head;
+		while (tmp->next != NULL)
+			tmp = tmp->next;
+
+		tmp->prev->next = NULL;
+		delete tmp;
+		brel--;
+	}
+
+	head = new DListNode(el, NULL, head);
+	if(head->next!=NULL)
+		head->next->prev = head;
+
+	brel++;
+}
+
+void DList::addToTail(int el)
+{
+	if (!isEmpty())
+	{
+		DListNode* tmp = head;
+		while (tmp->next != NULL)
+			tmp = tmp->next;
+		tmp->next = new DListNode(el, tmp, NULL);
+	}
+	else
+		addToHead(el);
+}
+
+int DList::deleteFromHead()
+{
+	if (isEmpty())
+		throw new exception("List is empty");
+	int el = head->info;
+	DListNode *tmp = head;
+	head = head->next;
+	if(head!=NULL)
+		head->prev = NULL;
+	delete tmp;
+	return el;
+}
+
+int DList::deleteFromTail()
+{
+	if (isEmpty())
+		throw new exception("List is empty");
+	int el;
+	if (head->next == NULL)
+	{
+		return deleteFromHead();
+	}
+	else
+	{
+		DListNode *tmp = head;
+		while (tmp->next != NULL)
+		{
+			tmp = tmp->next;
+		}
+		el = tmp->info;
+		tmp->prev->next = NULL;
+		delete tmp;
+	}
+	return el;
+}
+
+void DList::printAll()
+{
+	DListNode *tmp = head;
+	while (tmp != NULL)
+	{
+		cout << tmp->print() << " ";
+		tmp = tmp->next;
+	}
+	cout << endl;
+}
+
+void DList::insertSorted(int el)
+{
+	
+	if (!isEmpty()) {
+		DListNode* tmp;
+		tmp = head;
+		bool gotovo = false;
+
+
+		while (tmp != NULL && !gotovo) {
+			
+			if (tmp->info >= el){
+				if (tmp == head) {
+						DListNode* newNode = new DListNode(el, NULL, tmp);
+						head = newNode;
+						tmp->prev = newNode;
+						gotovo = true;
+				}
+				else {
+						DListNode* newNode = new DListNode(el, tmp->prev, tmp);
+						tmp->prev->next = newNode;
+						gotovo = true;
+				}
+		
+			}
+			else if (tmp->info < el) {
+				if (tmp->next == NULL) {
+					addToTail(el);
+					gotovo = true;
+				}
+				else if (tmp->next->info > el) {
+						DListNode* newNode = new DListNode(el, tmp, tmp->next);
+
+						tmp->next->prev = newNode;
+						tmp->next = newNode;
+						gotovo = true;
+				}		
+			}
+			tmp = tmp->next;
+			
+		}
+		
+		
+	}
+	else
+		addToHead(el);
+
+	brel++;
+}
+
+void DList::add(DListNode* dn)
+{
+	if (isFull())
+	{
+		DListNode* tmp = head;
+		while (tmp->next != NULL)
+			tmp = tmp->next;
+
+		tmp->prev->next = NULL;
+		delete tmp;
+
+		dn->next = head;
+		head->prev = dn;
+		dn->prev = NULL;
+		head = dn;
+	}
+	else
+	{
+		if (isEmpty())
+		{
+			head = dn;
+			dn->next = NULL;
+			dn->prev = NULL;
+		}
+		else
+		{
+			dn->next = head;
+			head->prev = dn;
+			dn->prev = NULL;
+			head = dn;
+		}
+		brel++;
+	}
+	
+}
+
+DListNode* DList::get(int info)
+{
+	if (isEmpty())
+		throw new exception("Prazan Cache!");
+
+	DListNode* tmp = head;
+	
+	while (tmp != NULL && tmp->info != info)
+	{
+		if (tmp->info != info)
+			tmp = tmp->next;
+	}
+
+	if (tmp == NULL)
+		throw new exception("Nije nadjen element u Cacheu!");
+	else
+	{
+		DListNode* switchel = head;
+		if (tmp == head)
+			return tmp;
+
+		if (tmp->next == NULL)
+		{
+			tmp->prev->next = NULL;
+			tmp->next = head;
+			head->prev = tmp;
+			tmp->prev = NULL;
+			head = tmp;
+
+			return tmp;
+		}
+		else
+		{
+			tmp->next->prev = tmp->prev;
+			tmp->prev->next = tmp->next;
+			tmp->next = head;
+			head->prev = tmp;
+			tmp->prev = NULL;
+			head = tmp;
+
+			return tmp;
+		}
+	}
+		
+}

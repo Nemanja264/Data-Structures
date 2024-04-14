@@ -182,13 +182,12 @@ void LList::aggregateByValue(int points)
 
 	LListNode* tmp = head;
 
-	while (tmp->info->getPts() != points && tmp != NULL)
+	while (tmp->info->getPts() != points)
 	{
 		tmp = tmp->next;
+		if (tmp == NULL)
+			throw ("Ne postoji takav igrac!");
 	}
-
-	if (tmp == NULL)
-		throw ("Ne postoji takav igrac!");
 
 	if (tmp->next == NULL)
 		throw ("Nadjen, ali na poslednjem mestu!");

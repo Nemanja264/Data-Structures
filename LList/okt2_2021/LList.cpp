@@ -173,7 +173,8 @@ LListNode* LList::removeNodeFromHead()
 	return tmp;
 }
 
-void LList::deleteFrom(int val, int noToDelete)
+void LList::deleteFrom(int val, int noToDelete) // ja sam skapirao da treba do noToDelete (najvise ako je moguce)elemenata da se obrise
+						// ali mozda su mislili i do elementa sa noToDelete == info da se brise, ali nisu bas najjasnije napisali
 {
 	LListNode* tmp = head;
 	LListNode* prev = NULL;
